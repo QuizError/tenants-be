@@ -15,7 +15,6 @@ import to.co.divinesolutions.tenors.utils.ResponseCode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +98,12 @@ public class BillServiceImpl implements BillService{
             billDetails.add(billDetail);
         }
         return billDetails;
+    }
+
+    @Override
+    public List<Bill>  getPropertyBills(String userUid){
+        List<Long> propertyIds = propertyService.getMyPropertyIds(userUid);
+        return billRepository.findAllByPropertyIdIn(propertyIds);
     }
 
     @Override

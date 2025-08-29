@@ -5,11 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentDto;
+import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentSearchRequest;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.PaymentRepository;
 import to.co.divinesolutions.tenors.entity.*;
 import to.co.divinesolutions.tenors.enums.PaymentStatus;
+import to.co.divinesolutions.tenors.property.service.PropertyService;
 import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
 import to.co.divinesolutions.tenors.sms.dto.Recipient;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
@@ -28,6 +31,7 @@ import java.util.Optional;
 public class PaymentServiceImpl implements PaymentService{
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
+    private final PropertyService propertyService;
     private final BillService billService;
     private final SMSService smsService;
     @Override
@@ -77,8 +81,17 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public Page<PaymentDetails> paymentDetailsPage(Pageable pageable) {
-        return paymentRepository.findAll(pageable).map(payment -> {
+    public Page<PaymentDetails> paymentDetailsPage(String userUid, Pageable pageable) {
+        // Get the bills for this user
+        List<Bill> userBills = billService.getPropertyBills(userUid);
+
+        // If no bills found, return empty page
+        if (userBills.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // Find payments only for this user's bills using your existing repository method
+        return paymentRepository.findAllByBillIn(userBills, pageable).map(payment -> {
             PaymentDetails details = new PaymentDetails();
             details.setUid(payment.getUid());
             details.setPaymentChannel(payment.getPaymentChannel());
@@ -94,6 +107,24 @@ public class PaymentServiceImpl implements PaymentService{
             return details;
         });
     }
+//    public Page<PaymentDetails> paymentDetailsPage(String userUid, Pageable pageable) {
+//
+//        return paymentRepository.findAll(pageable).map(payment -> {
+//            PaymentDetails details = new PaymentDetails();
+//            details.setUid(payment.getUid());
+//            details.setPaymentChannel(payment.getPaymentChannel());
+//            details.setPaymentDate(payment.getPaymentDate() != null ? payment.getPaymentDate().toString() : null);
+//            details.setCurrency(payment.getCurrency());
+//            details.setFspCode(payment.getFspCode());
+//            details.setFspName(payment.getFspName());
+//            details.setBillUid(payment.getBill().getUid());
+//            details.setPaidAmount(payment.getPaidAmount());
+//            details.setAmountDue(payment.getBill().getAmountDue());
+//            details.setThirdPartyReference(payment.getThirdPartyReference());
+//            details.setBillReferenceNumber(payment.getBillReferenceNumber());
+//            return details;
+//        });
+//    }
 
     @Override
     public Response<PaymentDetails> findByUid(String uid) {
@@ -132,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService{
             User user = rental.getClient().getUser();
             String clientName = user.getFirstname()+" "+user.getLastname();
             String clientMobile = user.getMsisdn();
-            smsDto.setMessage("Ndugu "+clientName+" malipo yako ya kodi ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na tunakutakia wakati mwema.");
+            smsDto.setMessage("Ndugu "+clientName+" malipo yako ya kodi ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" sawa na "+payment.getCurrency()+" "+payment.getPaidAmount()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na endelea kufurahia huduma zetu.");
             smsDto.setSourceAddr("Shuleni App");
             Recipient recipient = new Recipient();
             recipient.setRecipient_id(1);

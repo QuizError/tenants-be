@@ -18,6 +18,8 @@ public interface BillService {
 
     List<BillDetails> billDetailsList(String userUid);
 
+    List<Bill>  getPropertyBills(String userUid);
+
     Response<BillDetails> findByUid(String uid);
 
     Response<Bill> delete(String uid);

@@ -14,7 +14,7 @@ public interface PaymentService {
 
     Optional<Payment> getOptionalByUid(String uid);
 
-    Page<PaymentDetails> paymentDetailsPage(Pageable pageable);
+    Page<PaymentDetails> paymentDetailsPage(String userUid,Pageable pageable);
 
     Response<PaymentDetails> findByUid(String uid);
 }
