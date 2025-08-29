@@ -112,4 +112,19 @@ public class PropertyServiceImpl implements PropertyService{
         }
         return properties;
     }
+
+    @Override
+    public List<Long> getMyPropertyIds(String userUid){
+        List<GroupOwnership> groupOwnerships = groupOwnershipMemberService.listMyGroups(userUid);
+        List<Property> properties = new ArrayList<>();
+        for (GroupOwnership groupOwnership: groupOwnerships){
+            List<Property> optionalProperties = propertyRepository.findAllByOwnerIdAndOwnershipType(groupOwnership.getId(),groupOwnership.getOwnershipType());
+            properties.addAll(optionalProperties);
+        }
+        List<Long> propertyIds = new ArrayList<>();
+        for (Property property: properties){
+            propertyIds.add(property.getId());
+        }
+        return propertyIds;
+    }
 }

@@ -6,11 +6,9 @@ import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDto;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.BillRepository;
-import to.co.divinesolutions.tenors.entity.Bill;
-import to.co.divinesolutions.tenors.entity.Payment;
-import to.co.divinesolutions.tenors.entity.Rental;
-import to.co.divinesolutions.tenors.entity.User;
+import to.co.divinesolutions.tenors.entity.*;
 import to.co.divinesolutions.tenors.enums.BillStatus;
+import to.co.divinesolutions.tenors.property.service.PropertyService;
 import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
 import to.co.divinesolutions.tenors.utils.Response;
 import to.co.divinesolutions.tenors.utils.ResponseCode;
@@ -26,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BillServiceImpl implements BillService{
     private final BillRepository billRepository;
+    private final PropertyService propertyService;
     private final RentalRepository rentalRepository;
 
     @Override
@@ -70,9 +69,11 @@ public class BillServiceImpl implements BillService{
     }
 
     @Override
-    public List<BillDetails> billDetailsList(){
+    public List<BillDetails> billDetailsList(String userUid){
+
+        List<Long> propertyIds = propertyService.getMyPropertyIds(userUid);
         List<BillDetails> billDetails = new ArrayList<>();
-        for (Bill bill: billRepository.findAll()){
+        for (Bill bill: billRepository.findAllByPropertyIdIn(propertyIds)){
             BillDetails billDetail = new BillDetails();
             billDetail.setBillDescription(bill.getBillDescription());
             billDetail.setBillType(bill.getBillType());
@@ -166,4 +167,6 @@ public class BillServiceImpl implements BillService{
         bill.setBillStatus(dueAmount.compareTo(BigDecimal.ZERO) == 0 ? BillStatus.Paid : BillStatus.PartyPaid);
         billRepository.save(bill);
     }
+
+
 }

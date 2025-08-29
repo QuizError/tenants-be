@@ -13,4 +13,5 @@ public interface BillRepository extends JpaRepository<Bill,Long> {
     Optional<Bill> findFirstByUid(String uid);
     Optional<Bill> findFirstByBillReferenceNumber(String referenceNumber);
     List<Bill> findAllByBillStatusAndAffectedFalse(BillStatus billStatus);
+    List<Bill> findAllByPropertyIdIn(List<Long> propertyIds);
 }

@@ -18,9 +18,9 @@ public class BillController {
 
     private final BillService billService;
 
-    @GetMapping
-    public List<BillDetails> paymentList(){
-        return billService.billDetailsList();
+    @GetMapping("/my-properties/{uid}")
+    public List<BillDetails> paymentList(@PathVariable("uid") String uid){
+        return billService.billDetailsList(uid);
     }
 
     @GetMapping("{uid}")

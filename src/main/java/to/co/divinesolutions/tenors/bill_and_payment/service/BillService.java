@@ -16,7 +16,7 @@ public interface BillService {
 
     Optional<Bill> getOptionalByBillReference(String billReference);
 
-    List<BillDetails> billDetailsList();
+    List<BillDetails> billDetailsList(String userUid);
 
     Response<BillDetails> findByUid(String uid);
 

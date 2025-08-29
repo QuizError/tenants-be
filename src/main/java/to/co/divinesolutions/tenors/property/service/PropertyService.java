@@ -21,4 +21,6 @@ public interface PropertyService {
     Response<Property> delete(String uid);
 
     List<Property> getMyProperties(String userUid);
+
+    List<Long> getMyPropertyIds(String userUid);
 }
