@@ -52,6 +52,7 @@ public class PropertyServiceImpl implements PropertyService{
                 property.setOwnerId(ownerId);
             }
             property.setName(dto.getName());
+            property.setSenderName(dto.getSenderName());
             property.setStartFunction(LocalDate.now());
             property.setLocation(dto.getLocation());
             property.setOwnershipType(dto.getOwnershipType());
@@ -68,6 +69,11 @@ public class PropertyServiceImpl implements PropertyService{
     @Override
     public Optional<Property> getOptionalByUid(String  uid){
         return uid != null && !uid.isEmpty() ? propertyRepository.findFirstByUid(uid) : Optional.empty();
+    }
+
+    @Override
+    public Optional<Property> getOptionalById(Long  id){
+        return id != null  ? propertyRepository.findById(id) : Optional.empty();
     }
     @Override
     public List<Property> properties(){

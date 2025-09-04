@@ -13,6 +13,7 @@ public interface PropertyService {
     Response<Property> save(PropertyDto dto);
 
     Optional<Property> getOptionalByUid(String uid);
+    Optional<Property> getOptionalById(Long id);
 
     List<Property> properties();
 

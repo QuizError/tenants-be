@@ -107,24 +107,6 @@ public class PaymentServiceImpl implements PaymentService{
             return details;
         });
     }
-//    public Page<PaymentDetails> paymentDetailsPage(String userUid, Pageable pageable) {
-//
-//        return paymentRepository.findAll(pageable).map(payment -> {
-//            PaymentDetails details = new PaymentDetails();
-//            details.setUid(payment.getUid());
-//            details.setPaymentChannel(payment.getPaymentChannel());
-//            details.setPaymentDate(payment.getPaymentDate() != null ? payment.getPaymentDate().toString() : null);
-//            details.setCurrency(payment.getCurrency());
-//            details.setFspCode(payment.getFspCode());
-//            details.setFspName(payment.getFspName());
-//            details.setBillUid(payment.getBill().getUid());
-//            details.setPaidAmount(payment.getPaidAmount());
-//            details.setAmountDue(payment.getBill().getAmountDue());
-//            details.setThirdPartyReference(payment.getThirdPartyReference());
-//            details.setBillReferenceNumber(payment.getBillReferenceNumber());
-//            return details;
-//        });
-//    }
 
     @Override
     public Response<PaymentDetails> findByUid(String uid) {
@@ -163,8 +145,10 @@ public class PaymentServiceImpl implements PaymentService{
             User user = rental.getClient().getUser();
             String clientName = user.getFirstname()+" "+user.getLastname();
             String clientMobile = user.getMsisdn();
+            Optional<Property> optionalProperty = propertyService.getOptionalById(rental.getPropertyId());
+            Property property = optionalProperty.orElse(null);
             smsDto.setMessage("Ndugu "+clientName+" malipo yako ya kodi ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" sawa na "+payment.getCurrency()+" "+payment.getPaidAmount()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na endelea kufurahia huduma zetu.");
-            smsDto.setSourceAddr("Shuleni App");
+            smsDto.setSourceAddr(property != null ? property.getSenderName() : "HOMES APP");
             Recipient recipient = new Recipient();
             recipient.setRecipient_id(1);
             recipient.setDest_addr(clientMobile);

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class PropertyDto {
     private String uid;
     private String name;
+    private String senderName;
     private String ownerUid;
     private String location;
     private LocalDate endFunction;

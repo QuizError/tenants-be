@@ -20,6 +20,7 @@ import java.time.LocalDate;
 public class Property extends BaseEntity {
 
     private String name;
+    private String senderName;
     private Long ownerId;
     private LocalDate startFunction;
     private LocalDate endFunction;
