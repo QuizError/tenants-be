@@ -31,6 +31,11 @@ public class RentalController {
         return rentalService.myRentals(uid);
     }
 
+    @GetMapping("/contract-end/owner/{uid}")
+    public List<RentalDto> myPropertyRentalsEndingThisMonth(@PathVariable String uid){
+        return rentalService.myPropertyRentalsEndingThisMonth(uid);
+    }
+
     @GetMapping("/client/{uid}")
     public List<RentalDto> allClientRentals(@PathVariable String uid){
         return rentalService.clientRentals(uid);

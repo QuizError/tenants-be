@@ -20,5 +20,7 @@ public interface RentalService {
 
     List<RentalDto> myRentals(String userUid);
 
+    List<RentalDto> myPropertyRentalsEndingThisMonth(String userUid);
+
     List<RentalDto> clientRentals(String clientUid);
 }

@@ -198,22 +198,53 @@ public class RentalServiceImpl implements RentalService{
                 List<RentalDto> rentalDtoList = new ArrayList<>();
                 for (Rental rental : rentalRepository.findAllByPropertyIdIn(propertyIds)){
                     RentalDto rentalDto = new RentalDto();
+                    log.info("Rental list size is: {}",rentalDtoList.size());
                     String clientName = rental.getClient().getUser().getFirstname()+" "+rental.getClient().getUser().getMiddleName()+" "+rental.getClient().getUser().getLastname();
                     rentalDto.setClientName(clientName);
+                    rentalDto.setStartDate(rental.getStartDate().toString());
                     rentalDto.setUid(rental.getUid());
                     rentalDto.setClientUid(rental.getClient().getUid());
-                    rentalDto.setStartDate(rental.getStartDate().toString());
-                    rentalDto.setEndDate(rental.getEndDate().toString());
                     rentalDto.setRentalStatus(rental.getRentalStatus());
                     rentalDto.setPrice(rental.getRentalAmount());
                     rentalDto.setCurrency(rental.getCurrency());
                     rentalDto.setBillStatus(rental.getBillStatus());
+                    rentalDto.setEndDate(rental.getEndDate().toString());
                     rentalDto.setUnitSectionName(rental.getUnitSection().getName());
                     rentalDto.setUnitSectionUid(rental.getUnitSection().getUid());
                     rentalDtoList.add(rentalDto);
                 }
                 return rentalDtoList;
             }
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<RentalDto> myPropertyRentalsEndingThisMonth(String userUid){
+        List<Long> propertyIds = propertyService.getMyPropertyIds(userUid);
+        if (!propertyIds.isEmpty()){
+            log.info("Property Ids: {}",propertyIds);
+            List<RentalDto> rentalList = new ArrayList<>();
+            for (Rental rental : rentalRepository.findMyPropertiesRentalsEndingWithin30Days(propertyIds)){
+                RentalDto rentalDto = new RentalDto();
+                log.info("rentals list {}", rentalList.size());
+                String clientName = rental.getClient().getUser().getFirstname()+" "+rental.getClient().getUser().getMiddleName()+" "+rental.getClient().getUser().getLastname();
+                log.info("Getting  client name: {}", clientName);
+                rentalDto.setClientName(clientName);
+                rentalDto.setClientUid(rental.getClient().getUid());
+                rentalDto.setUnitName(rental.getUnitSection().getUnit().getName());
+                rentalDto.setUid(rental.getUid());
+                rentalDto.setStartDate(rental.getStartDate().toString());
+                rentalDto.setEndDate(rental.getEndDate().toString());
+                rentalDto.setRentalStatus(rental.getRentalStatus());
+                rentalDto.setPrice(rental.getRentalAmount());
+                rentalDto.setCurrency(rental.getCurrency());
+                rentalDto.setBillStatus(rental.getBillStatus());
+                rentalDto.setUnitSectionName(rental.getUnitSection().getName());
+                rentalDto.setUnitSectionUid(rental.getUnitSection().getUid());
+                rentalList.add(rentalDto);
+            }
+            return rentalList;
         }
         return Collections.emptyList();
     }

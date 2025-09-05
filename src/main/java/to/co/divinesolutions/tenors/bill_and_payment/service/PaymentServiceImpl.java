@@ -145,10 +145,11 @@ public class PaymentServiceImpl implements PaymentService{
             User user = rental.getClient().getUser();
             String clientName = user.getFirstname()+" "+user.getLastname();
             String clientMobile = user.getMsisdn();
-            Optional<Property> optionalProperty = propertyService.getOptionalById(rental.getPropertyId());
-            Property property = optionalProperty.orElse(null);
+            Property property = rental.getUnitSection().getUnit().getProperty();
+            String senderName = property.getSenderName() != null && !property.getSenderName().isEmpty() ? property.getSenderName() : "HOMES APP";
             smsDto.setMessage("Ndugu "+clientName+" malipo yako ya kodi ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" sawa na "+payment.getCurrency()+" "+payment.getPaidAmount()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na endelea kufurahia huduma zetu.");
-            smsDto.setSourceAddr(property != null ? property.getSenderName() : "HOMES APP");
+            smsDto.setSourceAddr(senderName);
+            log.info("Sender Name: {}", senderName);
             Recipient recipient = new Recipient();
             recipient.setRecipient_id(1);
             recipient.setDest_addr(clientMobile);

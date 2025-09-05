@@ -42,4 +42,6 @@ public class Rental extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private RentalStatus rentalStatus;
+
+    private Boolean endOfContractNotification = false;
 }

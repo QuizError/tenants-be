@@ -41,6 +41,7 @@ public class SMSServiceImpl implements SMSService{
         request.setMessage(smsDto.getMessage());
         String response = sendSmsApi(request);
 
+        log.info("SMS Request {}", request);
         log.error("SMS sending response: {}", response);
     }
 
