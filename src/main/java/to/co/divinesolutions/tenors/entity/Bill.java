@@ -30,6 +30,7 @@ public class Bill extends BaseEntity {
     private BigDecimal totalEquivalentAmount;
     private BigDecimal agentFee;
     private BigDecimal commission;
+    private Boolean commissionPaid = false;
     private String billReferenceNumber;
     private String thirdPartyReference;
     private String billDescription;

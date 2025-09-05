@@ -194,6 +194,8 @@ public class UnitSectionServiceImpl implements UnitSectionService{
                     sectionDto.setAvailability(unitSection.getAvailable());
                     sectionDto.setPrice(unitSection.getPrice());
                     sectionDto.setName(unitSection.getName());
+                    sectionDto.setPropertyName(unitSection.getUnit().getProperty().getName());
+                    sectionDto.setLocation(unitSection.getUnit().getProperty().getLocation());
                     sectionDto.setCurrency(unitSection.getCurrency());
                     sectionDto.setUid(unitSection.getUid());
                     sectionDto.setUnitName(unitSection.getUnit().getName());

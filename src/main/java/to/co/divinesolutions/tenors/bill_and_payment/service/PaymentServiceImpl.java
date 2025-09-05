@@ -126,13 +126,13 @@ public class PaymentServiceImpl implements PaymentService{
                 details.setAmountDue(payment.getBill().getAmountDue());
                 details.setThirdPartyReference(payment.getThirdPartyReference());
                 details.setBillReferenceNumber(payment.getBillReferenceNumber());
-                return new Response<>(true,ResponseCode.SUCCESS,"false", details);
+                return new Response<>(true,ResponseCode.SUCCESS,"Success", details);
             }
             else {
                 return new Response<>(false,ResponseCode.NO_DATA_FOUND,"Payment could not be found or may have been deleted from the system", null);
             }
         } catch (Exception e) {
-            return new Response<>(false, ResponseCode.NO_DATA_FOUND, "An error when loading payments", null);
+            return new Response<>(false, ResponseCode.INTERNAL_SERVER_ERROR, "An error when loading payments", null);
         }
     }
 

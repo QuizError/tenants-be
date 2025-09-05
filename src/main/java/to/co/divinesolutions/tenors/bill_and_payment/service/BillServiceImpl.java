@@ -137,7 +137,7 @@ public class BillServiceImpl implements BillService{
                 billDetail.setCustomerUid(user.getUid());
             }
             billDetail.setUid(bill.getUid());
-            return new Response<>(true, ResponseCode.NO_DATA_FOUND, "Success", billDetail);
+            return new Response<>(true, ResponseCode.SUCCESS, "Success", billDetail);
 
         } catch (Exception e) {
             return new Response<>(false, ResponseCode.NO_DATA_FOUND, "Bill could not be found or may have been deleted from the system", null);
