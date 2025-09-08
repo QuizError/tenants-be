@@ -3,11 +3,15 @@ package to.co.divinesolutions.tenors.clients.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import to.co.divinesolutions.tenors.bill_and_payment.repository.BillRepository;
+import to.co.divinesolutions.tenors.bill_and_payment.repository.PaymentRepository;
 import to.co.divinesolutions.tenors.clients.dto.ClientDto;
 import to.co.divinesolutions.tenors.clients.repository.ClientRepository;
-import to.co.divinesolutions.tenors.entity.Client;
-import to.co.divinesolutions.tenors.entity.User;
+import to.co.divinesolutions.tenors.entity.*;
+import to.co.divinesolutions.tenors.enums.BillType;
 import to.co.divinesolutions.tenors.enums.UserType;
+import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
 import to.co.divinesolutions.tenors.uaa.dto.UserDto;
 import to.co.divinesolutions.tenors.uaa.service.UserService;
 import to.co.divinesolutions.tenors.utils.Response;
@@ -24,6 +28,9 @@ import java.util.Optional;
 public class ClientServiceImpl implements ClientService{
 
     private final ClientRepository clientRepository;
+    private final RentalRepository rentalRepository;
+    private final BillRepository billRepository;
+    private final PaymentRepository paymentRepository;
     private final UserService userService;
 
     @Override
@@ -44,6 +51,16 @@ public class ClientServiceImpl implements ClientService{
 
         if (dto.getUserUid() != null && !dto.getUserUid().isEmpty() && userService.getOptionalByUid(dto.getUserUid()).isPresent()){
             User user = userService.getOptionalByUid(dto.getUserUid()).get();
+            user.setEmail(dto.getEmail());
+            user.setFirstname(dto.getFirstname());
+            user.setLastname(dto.getLastname());
+            user.setMiddleName(dto.getMiddleName());
+            user.setPassword(dto.getPassword());
+            user.setUserType(UserType.TENANT);
+            user.setMsisdn("255"+dto.getMsisdn().substring(dto.getMsisdn().length() -9));
+            user.setGender(dto.getGender());
+            user.setIdNumber(dto.getIdNumber());
+            userService.saveClientUser(user);
             client.setUser(user);
         }else {
             UserDto userDto = new UserDto();
@@ -86,6 +103,7 @@ public class ClientServiceImpl implements ClientService{
     }
 
     @Override
+    @Transactional
     public Response<Client> delete(String uid){
         try {
             Optional<Client> optionalClient = getOptionalByUid(uid);
@@ -93,12 +111,24 @@ public class ClientServiceImpl implements ClientService{
             if (optionalClient.isEmpty()){
                 return new Response<>(false, ResponseCode.NO_DATA_FOUND,"Client could not be found or may have been deleted from the system", null);
             }
-            clientRepository.delete(optionalClient.get());
+            Client client = optionalClient.get();
+            List<Rental> clientRentals = rentalRepository.findAllByClient(client);
+            for (Rental rental: clientRentals){
+                Optional<Bill> optionalBill = billRepository.findFirstByBillableIdAndBillType(rental.getId(), BillType.RENTALS);
+                if (optionalBill.isPresent()){
+                    Bill bill = optionalBill.orElse(null);
+                    paymentRepository.deleteAllByBill(bill);
+                    billRepository.delete(bill);
+                    rentalRepository.deleteAllByClient(client);
+                }
+            }
+            clientRepository.delete(client);
             return new Response<>(true,ResponseCode.SUCCESS,"Client deleted successfully", null);
         }
         catch (Exception e){
-            return new Response<>(false,ResponseCode.INTERNAL_SERVER_ERROR,"Error occurred when fetching client", null);
-
+            log.error("Error {} when deleting client",e.getMessage());
+            e.printStackTrace();
+            return new Response<>(false,ResponseCode.INTERNAL_SERVER_ERROR,"Error occurred when deleting client", null);
         }
     }
 

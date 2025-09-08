@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface RentalRepository extends JpaRepository<Rental,Long> {
     Optional<Rental> findFirstByUid(String uid);
+    List<Rental> findAllByClient(Client client);
+    void deleteAllByClient(Client client);
     List<Rental> findAllByPropertyIdIn(List<Long> propertyIds);
     List<Rental> findAllByClientAndRentalStatusNot(Client client, RentalStatus rentalStatus);
     @Query(value = "SELECT * FROM rentals WHERE end_of_contract_notification = false AND end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'",

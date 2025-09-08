@@ -61,6 +61,10 @@ public class UserServiceImpl implements UserService{
     public Optional<User> getOptionalByUid(String  uid){
         return uid != null && !uid.isEmpty() ? userRepository.findFirstByUid(uid) : Optional.empty();
     }
+    @Override
+    public void saveClientUser(User user){
+        userRepository.save(user);
+    }
 
     @Override
     public Response<User> findByUid(String uid){

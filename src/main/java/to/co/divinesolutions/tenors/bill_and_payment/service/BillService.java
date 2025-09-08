@@ -2,6 +2,7 @@ package to.co.divinesolutions.tenors.bill_and_payment.service;
 
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDto;
+import to.co.divinesolutions.tenors.bill_and_payment.projection.SoftwareCommissionUnpaid;
 import to.co.divinesolutions.tenors.entity.Bill;
 import to.co.divinesolutions.tenors.entity.Payment;
 import to.co.divinesolutions.tenors.utils.Response;
@@ -25,4 +26,6 @@ public interface BillService {
     Response<Bill> delete(String uid);
 
     void affectBill(Payment payment);
+
+    List<SoftwareCommissionUnpaid> unpaidList(String uid);
 }

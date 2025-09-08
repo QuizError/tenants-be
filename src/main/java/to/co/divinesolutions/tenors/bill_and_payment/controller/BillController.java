@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDetails;
+import to.co.divinesolutions.tenors.bill_and_payment.projection.SoftwareCommissionUnpaid;
 import to.co.divinesolutions.tenors.bill_and_payment.service.BillService;
 import to.co.divinesolutions.tenors.utils.Response;
 
@@ -21,6 +22,11 @@ public class BillController {
     @GetMapping("/my-properties/{uid}")
     public List<BillDetails> paymentList(@PathVariable("uid") String uid){
         return billService.billDetailsList(uid);
+    }
+
+    @GetMapping("/my-unpaid/{uid}")
+    public List<SoftwareCommissionUnpaid> unpaidList(@PathVariable("uid") String uid){
+        return billService.unpaidList(uid);
     }
 
     @GetMapping("{uid}")

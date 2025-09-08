@@ -14,6 +14,8 @@ public interface UserService {
 
     Optional<User> getOptionalByUid(String uid);
 
+    void saveClientUser(User user);
+
     Response<User> findByUid(String uid);
 
     Response<User> delete(String uid);

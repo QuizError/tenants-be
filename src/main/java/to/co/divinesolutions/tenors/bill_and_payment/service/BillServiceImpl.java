@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDto;
+import to.co.divinesolutions.tenors.bill_and_payment.projection.SoftwareCommissionUnpaid;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.BillRepository;
 import to.co.divinesolutions.tenors.entity.*;
 import to.co.divinesolutions.tenors.enums.BillStatus;
@@ -15,6 +16,7 @@ import to.co.divinesolutions.tenors.utils.ResponseCode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -173,5 +175,8 @@ public class BillServiceImpl implements BillService{
         billRepository.save(bill);
     }
 
-
+    @Override
+    public List<SoftwareCommissionUnpaid> unpaidList(String uid){
+        return uid!=null && !uid.isEmpty() ? billRepository.getUnpaidSoftwareCommission(uid) : Collections.emptyList();
+    }
 }

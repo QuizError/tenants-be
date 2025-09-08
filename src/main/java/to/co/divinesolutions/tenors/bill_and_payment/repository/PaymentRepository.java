@@ -13,5 +13,6 @@ import java.util.Optional;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment,Long> {
     Optional<Payment> findFirstByUid(String uid);
+    void deleteAllByBill(Bill bill);
     Page<Payment> findAllByBillIn(List<Bill> bills, Pageable pageable);
 }
