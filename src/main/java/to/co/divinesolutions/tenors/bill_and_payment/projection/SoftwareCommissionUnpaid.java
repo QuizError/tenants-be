@@ -14,7 +14,6 @@ public interface SoftwareCommissionUnpaid {
     String getCurrency();
     @Value("#{target.software_bill}")
     BigDecimal getSoftwareBill();
-
     @Value("#{target.total_bill_amount}")
     BigDecimal getTotalBillAmount();
 }

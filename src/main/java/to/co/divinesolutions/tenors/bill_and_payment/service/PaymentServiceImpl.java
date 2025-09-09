@@ -63,7 +63,7 @@ public class PaymentServiceImpl implements PaymentService{
             payment.setThirdPartyReference(dto.getThirdPartyReference());
             Payment saved = paymentRepository.save(payment);
             //send sms
-            sendPaymentSMS(saved);
+//            sendPaymentSMS(saved);
             //affect bill related
             billService.affectBill(saved);
 
