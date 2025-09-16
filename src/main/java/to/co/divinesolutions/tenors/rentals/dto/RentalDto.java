@@ -20,6 +20,8 @@ public class RentalDto {
     private String unitSectionUid;
     private String unitSectionName;
     private String unitName;
+    private String clientMobile;
+    private String propertyName;
     private String startDate;
     private String endDate;
     private BigDecimal price;

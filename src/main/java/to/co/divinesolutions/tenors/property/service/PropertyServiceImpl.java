@@ -52,6 +52,10 @@ public class PropertyServiceImpl implements PropertyService{
                 property.setOwnerId(ownerId);
             }
             property.setName(dto.getName());
+            property.setHasServiceCharge(dto.getHasServiceCharge());
+            property.setServiceChargeAmount(dto.getServiceChargeAmount());
+            property.setServiceChargeCurrency(dto.getServiceChargeCurrency());
+            property.setServiceChargeDescription(dto.getServiceChargeDescription());
             property.setSenderName(dto.getSenderName());
             property.setStartFunction(LocalDate.now());
             property.setLocation(dto.getLocation());

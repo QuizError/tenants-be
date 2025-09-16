@@ -8,12 +8,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import to.co.divinesolutions.tenors.entity.Property;
 import to.co.divinesolutions.tenors.entity.Rental;
+import to.co.divinesolutions.tenors.entity.UnitSection;
 import to.co.divinesolutions.tenors.entity.User;
+import to.co.divinesolutions.tenors.enums.RentalStatus;
+import to.co.divinesolutions.tenors.property.repository.UnitSectionRepository;
 import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
 import to.co.divinesolutions.tenors.sms.dto.Recipient;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
 import to.co.divinesolutions.tenors.sms.service.SMSService;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +30,7 @@ import java.util.Locale;
 public class RentalScheduler {
 
     private final RentalRepository rentalRepository;
+    private final UnitSectionRepository unitSectionRepository;
     private final SMSService smsService;
 
     @Async
@@ -56,5 +61,20 @@ public class RentalScheduler {
             List<Recipient> recipients = Collections.singletonList(recipient);
             smsDto.setRecipients(recipients);
             smsService.sendSms(smsDto);
+    }
+
+    @Async
+    @Scheduled(fixedDelay = 30000)
+    public void endRentalsOnEndDate() {
+        List<Rental> rentals = rentalRepository.findAllByEndDateAndRentalStatus(LocalDate.now(),RentalStatus.ACTIVE);
+        for (Rental rental : rentals){
+            log.info("******** Rent of {} house {} place of TZS {} ending at {} will be set expired and section will be made available",rental.getUnitSection().getUnit().getName() ,rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
+            rental.setRentalStatus(RentalStatus.EXPIRED);
+            rentalRepository.save(rental);
+            //unit section setting availability
+            UnitSection unitSection = rental.getUnitSection();
+            unitSection.setAvailable(true);
+            unitSectionRepository.save(unitSection);
+        }
     }
 }

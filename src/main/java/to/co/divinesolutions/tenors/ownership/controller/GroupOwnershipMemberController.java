@@ -32,7 +32,7 @@ public class GroupOwnershipMemberController {
     }
 
     @GetMapping
-    public List<GroupOwnershipMember> groupOwnerships(){
+    public List<GroupOwnershipMember> groupOwnershipMemberList(){
         return groupOwnershipMemberService.groupOwnershipMembers();
     }
 

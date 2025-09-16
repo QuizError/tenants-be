@@ -229,10 +229,14 @@ public class RentalServiceImpl implements RentalService{
                 RentalDto rentalDto = new RentalDto();
                 log.info("rentals list {}", rentalList.size());
                 String clientName = rental.getClient().getUser().getFirstname()+" "+rental.getClient().getUser().getMiddleName()+" "+rental.getClient().getUser().getLastname();
+                String clientMobile = rental.getClient().getUser().getMsisdn();
+                clientMobile = ("0"+clientMobile.substring(clientMobile.length() -9));
                 log.info("Getting  client name: {}", clientName);
                 rentalDto.setClientName(clientName);
+                rentalDto.setClientMobile(clientMobile);
                 rentalDto.setClientUid(rental.getClient().getUid());
                 rentalDto.setUnitName(rental.getUnitSection().getUnit().getName());
+                rentalDto.setPropertyName(rental.getUnitSection().getUnit().getProperty().getName());
                 rentalDto.setUid(rental.getUid());
                 rentalDto.setStartDate(rental.getStartDate().toString());
                 rentalDto.setEndDate(rental.getEndDate().toString());

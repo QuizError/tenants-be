@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import to.co.divinesolutions.tenors.enums.Currency;
 import to.co.divinesolutions.tenors.enums.PropertyFunctionStatus;
 import to.co.divinesolutions.tenors.enums.PropertyOwnershipType;
 import to.co.divinesolutions.tenors.utils.BaseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -25,6 +27,11 @@ public class Property extends BaseEntity {
     private LocalDate startFunction;
     private LocalDate endFunction;
     private String location;
+
+    private Boolean hasServiceCharge = false;
+    private BigDecimal serviceChargeAmount;
+    private Currency serviceChargeCurrency;
+    private String serviceChargeDescription;
 
     @Enumerated(EnumType.STRING)
     private PropertyFunctionStatus functionStatus;

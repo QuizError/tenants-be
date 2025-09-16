@@ -1,5 +1,7 @@
 package to.co.divinesolutions.tenors.uaa.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import to.co.divinesolutions.tenors.entity.User;
 import to.co.divinesolutions.tenors.uaa.dto.LoginDto;
 import to.co.divinesolutions.tenors.uaa.dto.UserData;
@@ -21,6 +23,8 @@ public interface UserService {
     Response<User> delete(String uid);
 
     List<User> users();
+
+    Page<User> usersPageable(Pageable pageable);
 
     Response<UserData> userLogin(LoginDto dto);
 }

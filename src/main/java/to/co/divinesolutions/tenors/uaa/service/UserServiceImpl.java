@@ -2,6 +2,8 @@ package to.co.divinesolutions.tenors.uaa.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.entity.User;
 import to.co.divinesolutions.tenors.uaa.dto.LoginDto;
@@ -36,15 +38,16 @@ public class UserServiceImpl implements UserService{
             }
 
             String msisdn = dto.getMobileNo() != null ? dto.getMobileNo() : "0710203040";
+            log.info("user msisdn: {}",msisdn);
             msisdn = "255"+msisdn.substring(msisdn.length() -9);
             User user = userOptional.orElse(new User());
-            user.setEmail(dto.getEmail());
             user.setLastname(dto.getLastname());
             user.setMiddleName(dto.getMiddleName());
             user.setFirstname(dto.getFirstname());
+            user.setEmail(dto.getEmail());
             user.setMsisdn(msisdn);
             user.setGender(dto.getGender());
-            user.setPassword(dto.getPassword());
+            user.setPassword(dto.getUid() == null  || dto.getUid().isEmpty() ? dto.getPassword() : user.getPassword());
             user.setIdNumber(dto.getIdNumber());
             user.setUserType(dto.getUserType());
             User saved = userRepository.save(user);
@@ -100,6 +103,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public Page<User> usersPageable(Pageable pageable) {
+        return userRepository.findActiveUsers(pageable);
+    }
+
+    @Override
     public Response<UserData> userLogin(LoginDto dto){
         try {
             Optional<User> optionalUser = userRepository.findFirstByEmailAndPassword(dto.getUsername(),dto.getPassword());
@@ -113,6 +121,7 @@ public class UserServiceImpl implements UserService{
             userData.setRole("Admin");
             userData.setUid(user.getUid());
             userData.setEmployeeId(user.getId());
+            userData.setUserType(user.getUserType());
             userData.setMobileNo(userData.getMobileNo());
             userData.setFullName(user.getFirstname()+" "+user.getLastname());
             return new Response<>(true, ResponseCode.SUCCESS, "Success", userData);
