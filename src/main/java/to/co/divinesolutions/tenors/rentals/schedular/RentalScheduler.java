@@ -63,7 +63,6 @@ public class RentalScheduler {
             smsService.sendSms(smsDto);
     }
 
-    @Async
     @Scheduled(fixedDelay = 30000)
     public void endRentalsOnEndDate() {
         log.info("***** scheduler to find expired rentals and update section availability ******");
