@@ -36,6 +36,9 @@ public class RentalScheduler {
     @Async
     @Scheduled(fixedDelay = 30000)
     public void getRentalsEndingWithin30Days() {
+        //start by ending the rentals first then
+        endRentalsOnEndDate();
+        //end here and proceed with giving notifications
         List<Rental> rentals = rentalRepository.findRentalsEndingWithin30Days();
         for (Rental rental : rentals){
             log.info("******** Rent of {} house {} place of TZS {} ending at {} will be sent sms",rental.getUnitSection().getUnit().getName() ,rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
@@ -63,7 +66,6 @@ public class RentalScheduler {
             smsService.sendSms(smsDto);
     }
 
-    @Scheduled(fixedDelay = 30000)
     public void endRentalsOnEndDate() {
         log.info("***** scheduler to find expired rentals and update section availability ******");
         List<Rental> rentals = rentalRepository.findAllByEndDateLessThanEqualAndRentalStatus(LocalDate.now(),RentalStatus.ACTIVE);
