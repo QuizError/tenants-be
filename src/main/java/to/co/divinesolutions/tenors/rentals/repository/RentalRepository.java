@@ -25,5 +25,7 @@ public interface RentalRepository extends JpaRepository<Rental,Long> {
     @Query(value = "SELECT * FROM rentals WHERE property_id in (:propertyIds) AND end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'",
             nativeQuery = true)
     List<Rental> findMyPropertiesRentalsEndingWithin30Days(List<Long> propertyIds);
-    List<Rental> findAllByEndDateAndRentalStatus(LocalDate endDate,RentalStatus rentalStatus);
+//    List<Rental> findAllByEndDateAndRentalStatus(LocalDate endDate,RentalStatus rentalStatus);
+    List<Rental> findAllByEndDateLessThanEqualAndRentalStatus(LocalDate endDate, RentalStatus rentalStatus);
+
 }
