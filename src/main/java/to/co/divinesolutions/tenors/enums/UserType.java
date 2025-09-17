@@ -1,5 +1,5 @@
 package to.co.divinesolutions.tenors.enums;
 
 public enum UserType {
-    INTERNAL,TENANT,OWNER,FINANCE
+    INTERNAL,TENANT,OWNER,FINANCE,MANAGER
 }

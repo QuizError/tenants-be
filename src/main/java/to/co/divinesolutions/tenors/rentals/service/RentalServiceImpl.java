@@ -223,15 +223,14 @@ public class RentalServiceImpl implements RentalService{
     public List<RentalDto> myPropertyRentalsEndingThisMonth(String userUid){
         List<Long> propertyIds = propertyService.getMyPropertyIds(userUid);
         if (!propertyIds.isEmpty()){
-            log.info("Property Ids: {}",propertyIds);
+//            log.info("Property Ids: {}",propertyIds);
             List<RentalDto> rentalList = new ArrayList<>();
             for (Rental rental : rentalRepository.findMyPropertiesRentalsEndingWithin30Days(propertyIds)){
                 RentalDto rentalDto = new RentalDto();
-                log.info("rentals list {}", rentalList.size());
+//                log.info("rentals list {}", rentalList.size());
                 String clientName = rental.getClient().getUser().getFirstname()+" "+rental.getClient().getUser().getMiddleName()+" "+rental.getClient().getUser().getLastname();
                 String clientMobile = rental.getClient().getUser().getMsisdn();
                 clientMobile = ("0"+clientMobile.substring(clientMobile.length() -9));
-                log.info("Getting  client name: {}", clientName);
                 rentalDto.setClientName(clientName);
                 rentalDto.setClientMobile(clientMobile);
                 rentalDto.setClientUid(rental.getClient().getUid());

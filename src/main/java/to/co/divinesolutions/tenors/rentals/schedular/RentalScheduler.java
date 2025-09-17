@@ -53,7 +53,7 @@ public class RentalScheduler {
             String formattedDate = rental.getEndDate()
                 .format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH));
             Property property = rental.getUnitSection().getUnit().getProperty();
-            smsDto.setMessage("Ndugu "+clientName+" tunapenda kukufahamisha kuwa Mkataba wako wa pango kwa nyumba "+rental.getUnitSection().getName()+" iliyopo "+rental.getUnitSection().getUnit().getName()+" utaisha muda wake "+formattedDate+". Tunakuhimiza ku thibitisha kuanza mkataba mwingine na kuulipia ndani ya wiki tatu kuanzia leo au kuachilia nafasi tarehe ya mwisho wa Mkataba wako. Asante kwa kuwa mpangaji wetu");
+            smsDto.setMessage("Ndugu "+clientName+" tunapenda kukufahamisha kuwa Mkataba wako wa pango kwa "+property.getName()+" kwenye nyumba "+rental.getUnitSection().getName()+" utaisha muda wake "+formattedDate+". Tunakuhimiza ku thibitisha kuanza mkataba mwingine na kuulipia ndani ya wiki tatu kuanzia leo au kuachilia nafasi tarehe ya mwisho wa Mkataba wako. Asante kwa kuwa mpangaji wetu");
             smsDto.setSourceAddr(property.getSenderName() != null && !property.getSenderName().isEmpty() ? property.getSenderName() : "HOMES APP");
             Recipient recipient = new Recipient();
             recipient.setRecipient_id(1);
@@ -68,7 +68,7 @@ public class RentalScheduler {
     public void endRentalsOnEndDate() {
         List<Rental> rentals = rentalRepository.findAllByEndDateLessThanEqualAndRentalStatus(LocalDate.now(),RentalStatus.ACTIVE);
         for (Rental rental : rentals){
-            log.info("******** Rent of {} house {} place of TZS {} ending at {} will be set expired and section will be made available",rental.getUnitSection().getUnit().getName() ,rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
+            log.info("******** Rent of property {} unit {} section {} place of TZS {} ending at {} will be set expired and section will be made available",rental.getUnitSection().getUnit().getProperty().getName(),rental.getUnitSection().getUnit().getName(),rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
             rental.setRentalStatus(RentalStatus.EXPIRED);
             rentalRepository.save(rental);
             //unit section setting availability

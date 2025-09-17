@@ -1,11 +1,15 @@
 package to.co.divinesolutions.tenors.uaa.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.entity.User;
+import to.co.divinesolutions.tenors.enums.Gender;
+import to.co.divinesolutions.tenors.enums.UserType;
 import to.co.divinesolutions.tenors.uaa.dto.LoginDto;
 import to.co.divinesolutions.tenors.uaa.dto.UserData;
 import to.co.divinesolutions.tenors.uaa.dto.UserDto;
@@ -13,6 +17,7 @@ import to.co.divinesolutions.tenors.uaa.repository.UserRepository;
 import to.co.divinesolutions.tenors.utils.Response;
 import to.co.divinesolutions.tenors.utils.ResponseCode;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -129,6 +134,30 @@ public class UserServiceImpl implements UserService{
         catch (Exception e){
             log.error("***** Error on fetching user: {}",e.getMessage());
             return new Response<>(true, ResponseCode.INTERNAL_SERVER_ERROR, "Error when deleting user data", null);
+        }
+    }
+    @PostConstruct
+    public void seedAdmin(){
+        try {
+
+            if(userRepository.findAll().isEmpty()){
+                log.info("No users, seeding an admin.");
+
+                User user = new User();
+                user.setFirstname("Super");
+                user.setMiddleName("System");
+                user.setLastname("Admin");
+                user.setGender(Gender.Male);
+                user.setEmail("admin@tmis.co.tz");
+                user.setMsisdn("255788218002");
+                user.setPassword("1000");
+                user.setIdNumber("19971009141280000127");
+                user.setUserType(UserType.INTERNAL);
+                userRepository.save(user);
+                log.info("An admin has been created.");
+            }
+        }catch (Exception exc){
+            log.error(exc.getMessage());
         }
     }
 
