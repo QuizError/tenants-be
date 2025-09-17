@@ -66,7 +66,9 @@ public class RentalScheduler {
     @Async
     @Scheduled(fixedDelay = 30000)
     public void endRentalsOnEndDate() {
+        log.info("***** scheduler to find expired rentals and update section availability ******");
         List<Rental> rentals = rentalRepository.findAllByEndDateLessThanEqualAndRentalStatus(LocalDate.now(),RentalStatus.ACTIVE);
+        log.info("***** List count {}",rentals.size());
         for (Rental rental : rentals){
             log.info("******** Rent of {} house {} place of TZS {} ending at {} will be set expired and section will be made available",rental.getUnitSection().getUnit().getName() ,rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
             rental.setRentalStatus(RentalStatus.EXPIRED);
