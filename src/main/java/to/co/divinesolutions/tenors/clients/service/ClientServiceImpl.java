@@ -145,6 +145,6 @@ public class ClientServiceImpl implements ClientService{
             return Collections.emptyList();
         }
         User user = optionalUser.get();
-        return clientRepository.findAllByCreatedBy(user.getId());
+        return clientRepository.getMyClients(user.getId());
     }
 }

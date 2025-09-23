@@ -5,14 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentDto;
-import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentSearchRequest;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.PaymentRepository;
 import to.co.divinesolutions.tenors.entity.*;
 import to.co.divinesolutions.tenors.enums.PaymentStatus;
-import to.co.divinesolutions.tenors.property.service.PropertyService;
 import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
 import to.co.divinesolutions.tenors.sms.dto.Recipient;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
@@ -31,7 +28,6 @@ import java.util.Optional;
 public class PaymentServiceImpl implements PaymentService{
     private final PaymentRepository paymentRepository;
     private final RentalRepository rentalRepository;
-    private final PropertyService propertyService;
     private final BillService billService;
     private final SMSService smsService;
     @Override
@@ -50,7 +46,6 @@ public class PaymentServiceImpl implements PaymentService{
             }
 
             Payment payment = optionalPayment.orElse(new Payment());
-            payment.setCurrency(dto.getCurrency());
             payment.setFspCode(dto.getFspCode());
             payment.setFspName(dto.getFspName());
             payment.setBill(bill);

@@ -106,7 +106,7 @@ public class RentalServiceImpl implements RentalService{
         BigDecimal totalEquivalentAmount = rental.getRentalAmount().multiply(exchangeRate);
         billDto.setExchangeRate(exchangeRate);
         billDto.setTotalEquivalentAmount(totalEquivalentAmount);
-        billDto.setCommission(rental.getRentalAmount().multiply(BigDecimal.valueOf(0.0075)));
+        billDto.setCommission(rental.getRentalAmount().multiply(BigDecimal.valueOf(0.005)));
         billDto.setAgentFee(rental.getUnitSection().getPrice());
         billDto.setBillType(BillType.RENTALS);
         billDto.setPropertyId(rental.getPropertyId());
