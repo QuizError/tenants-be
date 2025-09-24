@@ -7,6 +7,7 @@ import to.co.divinesolutions.tenors.enums.BillType;
 import to.co.divinesolutions.tenors.enums.Currency;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,4 +26,5 @@ public class BillDto {
     private BillType billType;
     private Long billableId;
     private Long propertyId;
+    private List<BillItemDto> billItemDtoList;
 }

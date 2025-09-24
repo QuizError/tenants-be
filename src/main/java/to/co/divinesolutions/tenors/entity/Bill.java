@@ -1,9 +1,6 @@
 package to.co.divinesolutions.tenors.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +11,7 @@ import to.co.divinesolutions.tenors.enums.Currency;
 import to.co.divinesolutions.tenors.utils.BaseEntity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -47,4 +45,7 @@ public class Bill extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private BillStatus billStatus;
+
+    @OneToMany(mappedBy = "bill")
+    private List<BillItem> billItems;
 }

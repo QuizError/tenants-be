@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDto;
+import to.co.divinesolutions.tenors.bill_and_payment.dto.BillItemDto;
 import to.co.divinesolutions.tenors.bill_and_payment.service.BillService;
 import to.co.divinesolutions.tenors.clients.service.ClientService;
 import to.co.divinesolutions.tenors.entity.*;
@@ -49,6 +50,8 @@ public class RentalServiceImpl implements RentalService{
             }
             UnitSection unitSection = optionalUnitSection.get();
 
+            Property property = unitSection.getUnit().getProperty();
+
             Optional<Client> optionalClient = clientService.getOptionalByUid(dto.getClientUid());
             if (optionalClient.isEmpty()){
                 return new Response<>(false, ResponseCode.NO_DATA_FOUND, "Client could not be found or may have been deleted from the system", null);
@@ -66,15 +69,21 @@ public class RentalServiceImpl implements RentalService{
             BigDecimal totalBillAmount = BigDecimal.valueOf(monthsBetween)
                     .multiply(unitSection.getPrice());
 
+            BigDecimal totalServiceCharge = property.getHasServiceCharge() ? BigDecimal.valueOf(monthsBetween)
+                    .multiply(property.getServiceChargeAmount()) : BigDecimal.ZERO;
+
             Rental rental = optionalRental.orElse(new Rental());
             rental.setClient(client);
             rental.setUnitId(unitSection.getUnit().getId());
-            rental.setPropertyId(unitSection.getUnit().getProperty().getId());
+            rental.setPropertyId(property.getId());
             rental.setUnitSection(unitSection);
             rental.setBillStatus(dto.getBillStatus() != null ? dto.getBillStatus() : BillStatus.WaitingForPayment);
             rental.setRentalStatus(dto.getRentalStatus() != null ? dto.getRentalStatus() : RentalStatus.NOT_ACTIVE);
             rental.setStartDate(startDate);
             rental.setEndDate(endDate);
+            rental.setServiceChargeDescription(property.getServiceChargeDescription());
+            rental.setServiceCharge(totalServiceCharge);
+            rental.setSecureDeposit(rental.getUnitSection().getPrice());
             rental.setRentalAmount(totalBillAmount);
             rental.setCurrency(unitSection.getCurrency());
             Rental saved = rentalRepository.save(rental);
@@ -93,15 +102,37 @@ public class RentalServiceImpl implements RentalService{
         }
     }
 
-    void createBill(Rental rental){
+    void createBill(Rental rental) {
         BillDto billDto = new BillDto();
         billDto.setCurrency(rental.getCurrency());
-        billDto.setTotalAMount(rental.getRentalAmount());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMddHHmmss");
-        String billRef =rental.getPropertyId()+rental.getUnitId()+""+rental.getUnitSection().getId()+ LocalDateTime.now().format(formatter);
-        String billDescription = "Bill of "+rental.getUnitSection().getName()+" apartment of "+rental.getUnitSection().getUnit().getName()+" from "+rental.getStartDate()+" to "+rental.getEndDate();
+        String billRef = rental.getPropertyId() + rental.getUnitId() + rental.getUnitSection().getId() + LocalDateTime.now().format(formatter);
         billDto.setBillReferenceNumber(billRef);
-        billDto.setBillDescription(billDescription);
+        billDto.setBillDescription("Bill for renting " + rental.getUnitSection().getUnit().getProperty().getName() + " on unit "
+                + rental.getUnitSection().getName() + " from "
+                + rental.getStartDate() + " to " + rental.getEndDate());
+
+        List<BillItemDto> items = new ArrayList<>();
+
+        // Rental amount (always present)
+        items.add(createBillItem("Rental amount", rental.getRentalAmount(),rental.getCurrency() ,BillType.RENTALS));
+
+        // Service charge (optional)
+        if (rental.getServiceCharge() != null && rental.getServiceCharge().compareTo(BigDecimal.ZERO) > 0) {
+            items.add(createBillItem(rental.getServiceChargeDescription(), rental.getServiceCharge(),rental.getCurrency(), BillType.SERVICE_CHARGE));
+        }
+
+        // Secure deposit (optional)
+        if (rental.getSecureDeposit() != null && rental.getSecureDeposit().compareTo(BigDecimal.ZERO) > 0) {
+            items.add(createBillItem("Secure deposit", rental.getSecureDeposit(),rental.getCurrency(), BillType.SECURE_DEPOSIT));
+        }
+
+        // Set items and calculate total
+//        bill.setBillItems(items);
+        billDto.setTotalAMount(items.stream()
+                .map(BillItemDto::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+
         BigDecimal exchangeRate = BigDecimal.valueOf(rental.getCurrency().equals(Currency.TZS) ? 1 : 2450);
         BigDecimal totalEquivalentAmount = rental.getRentalAmount().multiply(exchangeRate);
         billDto.setExchangeRate(exchangeRate);
@@ -111,10 +142,19 @@ public class RentalServiceImpl implements RentalService{
         billDto.setBillType(BillType.RENTALS);
         billDto.setPropertyId(rental.getPropertyId());
         billDto.setBillableId(rental.getId());
+
+        // Save via your service
         billService.saveBill(billDto);
     }
 
-
+    private BillItemDto createBillItem(String description, BigDecimal amount, Currency currency, BillType type) {
+        BillItemDto item = new BillItemDto();
+        item.setDescription(description);
+        item.setAmount(amount);
+        item.setCurrency(currency);
+        item.setBillType(type);
+        return item;
+    }
 
     @Override
     public  Optional<Rental> getOptionalByUid(String uid) {

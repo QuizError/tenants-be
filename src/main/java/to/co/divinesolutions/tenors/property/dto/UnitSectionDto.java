@@ -18,6 +18,7 @@ public class UnitSectionDto {
     private String unitName;
     private String waterMeter;
     private String gasMeter;
+    private String squareMeters;
     private String electricityMeter;
     private BigDecimal price;
     private Currency currency;

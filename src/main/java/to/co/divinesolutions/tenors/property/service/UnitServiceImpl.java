@@ -42,6 +42,7 @@ public class UnitServiceImpl implements UnitService{
             Unit unit = optionalUnit.orElse(new Unit());
             unit.setProperty(property);
             unit.setName(dto.getName());
+            unit.setPropertyType(dto.getPropertyType());
             unit.setDescriptions(dto.getDescriptions());
             Unit saved = unitRepository.save(unit);
 

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import to.co.divinesolutions.tenors.enums.PropertyType;
+import to.co.divinesolutions.tenors.enums.ChecklistType;
 import to.co.divinesolutions.tenors.utils.BaseEntity;
 
 @Getter
@@ -13,15 +13,15 @@ import to.co.divinesolutions.tenors.utils.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "units")
-public class Unit  extends BaseEntity {
-    private String name;
-    private String descriptions;
-
+@Table(name = "checklist_templates")
+public class ChecklistTemplate extends BaseEntity {
     @ManyToOne
+    @JoinColumn(name = "property_id")
     private Property property;
 
     @Enumerated(EnumType.STRING)
-    private PropertyType propertyType;
+    private ChecklistType checklistType;
 
+    private String name;
+    private String description;
 }

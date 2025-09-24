@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDetails;
 import to.co.divinesolutions.tenors.bill_and_payment.dto.BillDto;
+import to.co.divinesolutions.tenors.bill_and_payment.dto.BillItemDto;
 import to.co.divinesolutions.tenors.bill_and_payment.projection.SoftwareCommissionUnpaid;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.BillRepository;
 import to.co.divinesolutions.tenors.entity.*;
@@ -38,6 +39,7 @@ public class BillServiceImpl implements BillService{
             }
 
             Bill bill = optionalBill.orElse(new Bill());
+            //saving bill and its items
             bill.setBillType(dto.getBillType());
             bill.setBillableId(dto.getBillableId());
             bill.setTotalAMount(dto.getTotalAMount());
@@ -51,6 +53,15 @@ public class BillServiceImpl implements BillService{
             bill.setBillReferenceNumber(dto.getBillReferenceNumber());
             bill.setTotalEquivalentAmount(dto.getTotalEquivalentAmount());
             Bill saved = billRepository.save(bill);
+            //saving bill Item
+            for (BillItemDto billItemDto : dto.getBillItemDtoList()){
+                BillItem billItem = new BillItem();
+                billItem.setDescription(billItem.getDescription());
+                billItem.setAmount(billItem.getAmount());
+                billItem.setBillType(billItem.getBillType());
+                billItem.setCurrency(billItem.getCurrency());
+                billItem.setBill(saved);
+            }
 
             return new Response<>(true, ResponseCode.SUCCESS, "Bill saved successfully", saved);
         }

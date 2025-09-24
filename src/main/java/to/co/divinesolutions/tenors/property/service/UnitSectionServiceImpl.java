@@ -52,6 +52,7 @@ public class UnitSectionServiceImpl implements UnitSectionService{
         unitSection.setWaterMeter(dto.getWaterMeter());
         unitSection.setElectricityMeter(dto.getElectricityMeter());
         unitSection.setAvailable(dto.getAvailable());
+        unitSection.setSquareMeters(dto.getSquareMeters());
         UnitSection savedSection = unitSectionRepository.save(unitSection);
 
         if (unitSectionDefinitionRepository.existsByUnitSection(savedSection)){

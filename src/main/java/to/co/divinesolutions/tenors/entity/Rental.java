@@ -31,8 +31,13 @@ public class Rental extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private BigDecimal rentalAmount;
+    private BigDecimal secureDeposit;
+    private BigDecimal serviceCharge;
     private Long propertyId;
     private Long unitId;
+
+    @Transient
+    private String serviceChargeDescription;
 
     @Enumerated(EnumType.STRING)
     private Currency currency;

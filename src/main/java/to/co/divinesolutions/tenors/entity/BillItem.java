@@ -1,39 +1,34 @@
 package to.co.divinesolutions.tenors.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import to.co.divinesolutions.tenors.enums.BillType;
 import to.co.divinesolutions.tenors.enums.Currency;
 import to.co.divinesolutions.tenors.utils.BaseEntity;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "unit_sections")
-public class UnitSection extends BaseEntity {
+@Table(name = "bill_items")
+public class BillItem extends BaseEntity {
 
-    private String name;
-    private BigDecimal price;
-    private Boolean available = false;
-    private Long propertyId;
-    private String electricityMeter;
-    private String waterMeter;
-    private String gasMeter;
-    private String squareMeters;
+    private BigDecimal amount;
+    private String description;
+    private BillType billType;
 
     @Enumerated(EnumType.STRING)
     private Currency currency;
 
     @ManyToOne
-    private Unit unit;
-
-    @OneToMany(mappedBy = "unitSection")
-    private List<UnitSectionDefinition> definitions;
+    @JsonIgnore
+    @JoinColumn(name = "bill_id")
+    private Bill bill;
 }
