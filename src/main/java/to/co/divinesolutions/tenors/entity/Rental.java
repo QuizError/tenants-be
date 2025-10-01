@@ -49,4 +49,5 @@ public class Rental extends BaseEntity {
     private RentalStatus rentalStatus;
 
     private Boolean endOfContractNotification = false;
+    private Boolean checklistCreated = false;
 }

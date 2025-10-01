@@ -18,6 +18,7 @@ public interface RentalRepository extends JpaRepository<Rental,Long> {
     void deleteAllByClient(Client client);
     List<Rental> findAllByPropertyIdIn(List<Long> propertyIds);
     List<Rental> findAllByClientAndRentalStatusNot(Client client, RentalStatus rentalStatus);
+    List<Rental> findAllByChecklistCreatedFalseAndRentalStatus(RentalStatus rentalStatus);
     @Query(value = "SELECT * FROM rentals WHERE end_of_contract_notification = false AND end_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'",
             nativeQuery = true)
     List<Rental> findRentalsEndingWithin30Days();

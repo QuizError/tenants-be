@@ -21,13 +21,7 @@ public class ChecklistInstance extends BaseEntity {
     @JoinColumn(name = "rental_id")
     private Rental rental;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;
-
-    @ManyToOne
-    @JoinColumn(name = "unit_section_id")
-    private UnitSection unitSection;
+    private Long propertyId;
 
     @ManyToOne
     @JoinColumn(name = "template_id")
