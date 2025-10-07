@@ -50,4 +50,5 @@ public class Rental extends BaseEntity {
 
     private Boolean endOfContractNotification = false;
     private Boolean checklistCreated = false;
+    private Boolean renewalConfirmed = false;
 }

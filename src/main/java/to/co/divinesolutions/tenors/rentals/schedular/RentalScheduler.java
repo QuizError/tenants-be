@@ -70,6 +70,7 @@ public class RentalScheduler {
         for (Rental rental : rentals){
             log.info("******** Rent of property {} unit {} section {} place of TZS {} ending at {} will be set expired and section will be made available",rental.getUnitSection().getUnit().getProperty().getName(),rental.getUnitSection().getUnit().getName(),rental.getUnitSection().getName(),rental.getRentalAmount(), rental.getEndDate());
             rental.setRentalStatus(RentalStatus.EXPIRED);
+            rental.setRenewalConfirmed(true);
             rentalRepository.save(rental);
             //unit section setting availability
             UnitSection unitSection = rental.getUnitSection();

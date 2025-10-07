@@ -322,4 +322,37 @@ public class RentalServiceImpl implements RentalService{
         return Collections.emptyList();
     }
 
+    @Override
+    public List<RentalDto> myExpiredPropertyRentals(String userUid){
+        List<Long> propertyIds = propertyService.getMyPropertyIds(userUid);
+        if (!propertyIds.isEmpty()){
+//            log.info("Property Ids: {}",propertyIds);
+            List<RentalDto> rentalList = new ArrayList<>();
+            for (Rental rental : rentalRepository.findMyExpiredPropertiesRentalsContracts(propertyIds)){
+                RentalDto rentalDto = new RentalDto();
+//                log.info("rentals list {}", rentalList.size());
+                String clientName = rental.getClient().getUser().getFirstname()+" "+rental.getClient().getUser().getMiddleName()+" "+rental.getClient().getUser().getLastname();
+                String clientMobile = rental.getClient().getUser().getMsisdn();
+                clientMobile = ("0"+clientMobile.substring(clientMobile.length() -9));
+                rentalDto.setClientName(clientName);
+                rentalDto.setClientMobile(clientMobile);
+                rentalDto.setClientUid(rental.getClient().getUid());
+                rentalDto.setUnitName(rental.getUnitSection().getUnit().getName());
+                rentalDto.setPropertyName(rental.getUnitSection().getUnit().getProperty().getName());
+                rentalDto.setUid(rental.getUid());
+                rentalDto.setStartDate(rental.getStartDate().toString());
+                rentalDto.setEndDate(rental.getEndDate().toString());
+                rentalDto.setRentalStatus(rental.getRentalStatus());
+                rentalDto.setPrice(rental.getRentalAmount());
+                rentalDto.setCurrency(rental.getCurrency());
+                rentalDto.setBillStatus(rental.getBillStatus());
+                rentalDto.setUnitSectionName(rental.getUnitSection().getName());
+                rentalDto.setUnitSectionUid(rental.getUnitSection().getUid());
+                rentalList.add(rentalDto);
+            }
+            return rentalList;
+        }
+        return Collections.emptyList();
+    }
+
 }
