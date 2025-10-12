@@ -69,7 +69,7 @@ public class RentalServiceImpl implements RentalService{
             BigDecimal totalBillAmount = BigDecimal.valueOf(monthsBetween)
                     .multiply(unitSection.getPrice());
 
-            BigDecimal totalServiceCharge = property.getHasServiceCharge() ? BigDecimal.valueOf(monthsBetween)
+            BigDecimal totalServiceCharge =  property.getHasServiceCharge() !=null && property.getHasServiceCharge() ? BigDecimal.valueOf(monthsBetween)
                     .multiply(property.getServiceChargeAmount()) : BigDecimal.ZERO;
 
             Rental rental = optionalRental.orElse(new Rental());
