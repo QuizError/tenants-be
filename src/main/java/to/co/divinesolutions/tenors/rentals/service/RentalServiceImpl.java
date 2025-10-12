@@ -83,7 +83,7 @@ public class RentalServiceImpl implements RentalService{
             rental.setEndDate(endDate);
             rental.setServiceChargeDescription(property.getServiceChargeDescription());
             rental.setServiceCharge(totalServiceCharge);
-            rental.setSecureDeposit(rental.getUnitSection().getPrice());
+            rental.setSecureDeposit(property.getHasSecureDeposit() != null && property.getHasSecureDeposit() ? rental.getUnitSection().getPrice() : null);
             rental.setRentalAmount(totalBillAmount);
             rental.setCurrency(unitSection.getCurrency());
             Rental saved = rentalRepository.save(rental);
@@ -93,7 +93,8 @@ public class RentalServiceImpl implements RentalService{
             //end
             unitSection.setAvailable(false);
             unitSectionService.changeAvailability(unitSection);
-
+            //remove red from dashboard
+            removeConfirmed(client);
             return new Response<>(true, ResponseCode.SUCCESS, "Rental record saved successfully now waiting for payment", saved);
         }
         catch (Exception e){
@@ -353,6 +354,15 @@ public class RentalServiceImpl implements RentalService{
             return rentalList;
         }
         return Collections.emptyList();
+    }
+
+    public void removeConfirmed(Client client){
+        Optional<Rental>  optionalRental = rentalRepository.findFirstByClientAndRenewalConfirmedTrue(client);
+        if (optionalRental.isPresent()){
+            Rental rental = optionalRental.get();
+            rental.setRenewalConfirmed(false);
+            rentalRepository.save(rental);
+        }
     }
 
 }

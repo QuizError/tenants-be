@@ -31,5 +31,5 @@ public interface RentalRepository extends JpaRepository<Rental,Long> {
             nativeQuery = true)
     List<Rental> findMyExpiredPropertiesRentalsContracts(List<Long> propertyIds);
     List<Rental> findAllByEndDateLessThanEqualAndRentalStatus(LocalDate endDate, RentalStatus rentalStatus);
-
+    Optional<Rental> findFirstByClientAndRenewalConfirmedTrue(Client client);
 }

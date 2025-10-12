@@ -29,6 +29,7 @@ public class Property extends BaseEntity {
     private String location;
 
     private Boolean hasServiceCharge = false;
+    private Boolean hasSecureDeposit = false;
     private BigDecimal serviceChargeAmount;
     private Currency serviceChargeCurrency;
     private String serviceChargeDescription;
