@@ -27,7 +27,7 @@ public interface RentalRepository extends JpaRepository<Rental,Long> {
             nativeQuery = true)
     List<Rental> findMyPropertiesRentalsEndingWithin30Days(List<Long> propertyIds);
 //    List<Rental> findAllByEndDateAndRentalStatus(LocalDate endDate,RentalStatus rentalStatus);
-    @Query(value = "SELECT * FROM rentals WHERE rental_status='EXPIRED' AND renewal_confirmed=true",
+    @Query(value = "SELECT * FROM rentals WHERE rental_status='EXPIRED' AND renewal_confirmed=true AND property_id in (:propertyIds)",
             nativeQuery = true)
     List<Rental> findMyExpiredPropertiesRentalsContracts(List<Long> propertyIds);
     List<Rental> findAllByEndDateLessThanEqualAndRentalStatus(LocalDate endDate, RentalStatus rentalStatus);
