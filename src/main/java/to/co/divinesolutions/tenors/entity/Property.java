@@ -27,11 +27,17 @@ public class Property extends BaseEntity {
     private LocalDate startFunction;
     private LocalDate endFunction;
     private String location;
+    private String contactPersonMobile;
+    private String contactPersonEmail;
 
     private Boolean hasServiceCharge = false;
     private Boolean hasSecureDeposit = false;
+    private Boolean notifyMeEndOfContract = false;
     private BigDecimal serviceChargeAmount;
+
+    @Enumerated(EnumType.STRING)
     private Currency serviceChargeCurrency;
+
     private String serviceChargeDescription;
 
     @Enumerated(EnumType.STRING)

@@ -8,10 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import to.co.divinesolutions.tenors.entity.SMSCallBackHistory;
 import to.co.divinesolutions.tenors.sms.dto.BeemSMSCallback;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
 import to.co.divinesolutions.tenors.sms.dto.SMSRequest;
+import to.co.divinesolutions.tenors.sms.dto.SentSmsBody;
+import to.co.divinesolutions.tenors.sms.repository.BeemCallBackRepository;
+
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
@@ -31,8 +36,10 @@ public class SMSServiceImpl implements SMSService{
 
     private final RestTemplate restTemplate;
 
+    private final BeemCallBackRepository beemCallBackRepository;
+
     @Override
-    public void sendSms(SMSDto smsDto){
+    public String sendSms(SMSDto smsDto){
         SMSRequest request = new SMSRequest();
         request.setSource_addr(smsDto.getSourceAddr());
         request.setEncoding("0");
@@ -42,7 +49,8 @@ public class SMSServiceImpl implements SMSService{
         String response = sendSmsApi(request);
 
         log.info("SMS Request {}", request);
-        log.error("SMS sending response: {}", response);
+        log.info("SMS sending response: {}", response);
+        return response;
     }
 
     public String sendSmsApi(SMSRequest smsRequest) {
@@ -55,7 +63,8 @@ public class SMSServiceImpl implements SMSService{
                 ObjectMapper objectMapper = new ObjectMapper();
                 BeemSMSCallback callback = objectMapper.readValue(response.getBody(), BeemSMSCallback.class);
                 log.info("{}",callback);
-                return "success";
+//                return "success";
+                return response.getBody();
             } else {
                 log.error("Failed to send SMS: " + response.getStatusCode());
                 return "Failed";
@@ -79,6 +88,23 @@ public class SMSServiceImpl implements SMSService{
 
         // Create the request entity with the actual data
         return new HttpEntity<>(data, headers);
+    }
+    @Override
+    public void saveSentSms(SentSmsBody body){
+        SMSCallBackHistory sms = new SMSCallBackHistory();
+        sms.setSmsType(body.getSmsType());
+        sms.setMessage(body.getMessage());
+        sms.setCode(body.getCode());
+        sms.setDuplicates(body.getDuplicates());
+        sms.setClientId(body.getClientId());
+        sms.setPropertyId(body.getPropertyId());
+        sms.setRentalId(body.getRentalId());
+        sms.setSuccessful(body.isSuccessful());
+        sms.setValid(body.getValid());
+        sms.setInvalid(body.getInvalid());
+        sms.setRequestId(body.getRequestId());
+        sms.setReceivedAt(LocalDateTime.now());
+        beemCallBackRepository.save(sms);
     }
 
 }

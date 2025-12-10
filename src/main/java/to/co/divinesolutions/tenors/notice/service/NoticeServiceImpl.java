@@ -1,16 +1,21 @@
 package to.co.divinesolutions.tenors.notice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import to.co.divinesolutions.tenors.entity.*;
+import to.co.divinesolutions.tenors.enums.SmsType;
 import to.co.divinesolutions.tenors.notice.dto.NoticeDto;
 import to.co.divinesolutions.tenors.notice.dto.NoticeResponse;
 import to.co.divinesolutions.tenors.notice.repository.NoticeRepository;
 import to.co.divinesolutions.tenors.property.service.PropertyService;
 import to.co.divinesolutions.tenors.rentals.service.RentalService;
+import to.co.divinesolutions.tenors.sms.dto.BeemSMSCallback;
 import to.co.divinesolutions.tenors.sms.dto.Recipient;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
+import to.co.divinesolutions.tenors.sms.dto.SentSmsBody;
 import to.co.divinesolutions.tenors.sms.service.SMSService;
 import to.co.divinesolutions.tenors.utils.Response;
 import to.co.divinesolutions.tenors.utils.ResponseCode;
@@ -173,7 +178,7 @@ public class NoticeServiceImpl implements NoticeService{
         }
     }
 
-    void sendNoticeSMS(Rental rental,String content){
+    void sendNoticeSMS(Rental rental,String content) throws JsonProcessingException {
         SMSDto smsDto = new SMSDto();
             User user = rental.getClient().getUser();
             String clientName = user.getFirstname()+" "+user.getLastname();
@@ -190,7 +195,25 @@ public class NoticeServiceImpl implements NoticeService{
             recipient.setDest_addr(clientMobile);
             List<Recipient> recipients = Collections.singletonList(recipient);
             smsDto.setRecipients(recipients);
-            smsService.sendSms(smsDto);
+            String smsSentResponse =  smsService.sendSms(smsDto);
+
+            //saving the message sent to Client
+            ObjectMapper mapper = new ObjectMapper();
+            BeemSMSCallback response = mapper.readValue(smsSentResponse, BeemSMSCallback.class);
+
+            SentSmsBody sentSmsBody = new SentSmsBody();
+            sentSmsBody.setSmsType(SmsType.NOTICE);
+            sentSmsBody.setMessage(message);
+            sentSmsBody.setRentalId(rental.getId());
+            sentSmsBody.setPropertyId(property.getId());
+            sentSmsBody.setCode(response.getCode());
+            sentSmsBody.setInvalid(response.getInvalid());
+            sentSmsBody.setDuplicates(response.getDuplicates());
+            sentSmsBody.setSuccessful(response.isSuccessful());
+            sentSmsBody.setValid(response.getValid());
+            sentSmsBody.setRequestId(response.getRequest_id());
+            sentSmsBody.setClientId(rental.getClient().getId());
+            smsService.saveSentSms(sentSmsBody);
     }
 
 }

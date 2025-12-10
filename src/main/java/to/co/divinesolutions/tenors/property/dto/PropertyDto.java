@@ -17,6 +17,7 @@ public class PropertyDto {
     private String uid;
     private String name;
     private Boolean hasServiceCharge = false;
+    private Boolean notifyMeEndOfContract = false;
     private BigDecimal serviceChargeAmount;
     private Currency serviceChargeCurrency;
     private String serviceChargeDescription;
@@ -27,4 +28,6 @@ public class PropertyDto {
     private LocalDate startFunction;
     private PropertyOwnershipType ownershipType;
     private PropertyFunctionStatus functionStatus;
+    private String contactPersonMobile;
+    private String contactPersonEmail;
 }

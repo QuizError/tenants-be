@@ -1,5 +1,8 @@
 package to.co.divinesolutions.tenors.bill_and_payment.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -10,9 +13,12 @@ import to.co.divinesolutions.tenors.bill_and_payment.dto.PaymentDto;
 import to.co.divinesolutions.tenors.bill_and_payment.repository.PaymentRepository;
 import to.co.divinesolutions.tenors.entity.*;
 import to.co.divinesolutions.tenors.enums.PaymentStatus;
+import to.co.divinesolutions.tenors.enums.SmsType;
 import to.co.divinesolutions.tenors.rentals.repository.RentalRepository;
+import to.co.divinesolutions.tenors.sms.dto.BeemSMSCallback;
 import to.co.divinesolutions.tenors.sms.dto.Recipient;
 import to.co.divinesolutions.tenors.sms.dto.SMSDto;
+import to.co.divinesolutions.tenors.sms.dto.SentSmsBody;
 import to.co.divinesolutions.tenors.sms.service.SMSService;
 import to.co.divinesolutions.tenors.utils.Response;
 import to.co.divinesolutions.tenors.utils.ResponseCode;
@@ -132,7 +138,7 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
 
-    void sendPaymentSMS(Payment payment){
+    void sendPaymentSMS(Payment payment) throws JsonProcessingException {
         SMSDto smsDto = new SMSDto();
         Optional<Rental>  optionalRental =  rentalRepository.findById(payment.getBill().getBillableId());
         if (optionalRental.isPresent()){
@@ -142,7 +148,8 @@ public class PaymentServiceImpl implements PaymentService{
             String clientMobile = user.getMsisdn();
             Property property = rental.getUnitSection().getUnit().getProperty();
             String senderName = property.getSenderName() != null && !property.getSenderName().isEmpty() ? property.getSenderName() : "HOMES APP";
-            smsDto.setMessage("Ndugu "+clientName+" malipo yako ya kodi ya pango kwa "+ property.getName()+" "+ rental.getUnitSection().getName()+" ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" sawa na "+payment.getCurrency()+" "+payment.getPaidAmount()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na endelea kufurahia huduma zetu.");
+            String messageBody = "Ndugu "+clientName+" malipo yako ya kodi ya pango kwa "+ property.getName()+" "+ rental.getUnitSection().getName()+" ya kuanzia "+rental.getStartDate()+" mpaka "+rental.getEndDate()+" sawa na "+payment.getCurrency()+" "+payment.getPaidAmount()+" yamekamilika stakabadhi ya malipo "+payment.getThirdPartyReference()+" karibu sana na endelea kufurahia huduma zetu.";
+            smsDto.setMessage(messageBody);
             smsDto.setSourceAddr(senderName);
             log.info("Sender Name: {}", senderName);
             Recipient recipient = new Recipient();
@@ -150,7 +157,25 @@ public class PaymentServiceImpl implements PaymentService{
             recipient.setDest_addr(clientMobile);
             List<Recipient> recipients = Collections.singletonList(recipient);
             smsDto.setRecipients(recipients);
-            smsService.sendSms(smsDto);
+            String smsSentResponse =  smsService.sendSms(smsDto);
+
+            //saving the message sent to Client
+            ObjectMapper mapper = new ObjectMapper();
+            BeemSMSCallback response = mapper.readValue(smsSentResponse, BeemSMSCallback.class);
+
+            SentSmsBody sentSmsBody = new SentSmsBody();
+            sentSmsBody.setSmsType(SmsType.PAYMENT);
+            sentSmsBody.setMessage(messageBody);
+            sentSmsBody.setRentalId(rental.getId());
+            sentSmsBody.setPropertyId(property.getId());
+            sentSmsBody.setCode(response.getCode());
+            sentSmsBody.setInvalid(response.getInvalid());
+            sentSmsBody.setDuplicates(response.getDuplicates());
+            sentSmsBody.setSuccessful(response.isSuccessful());
+            sentSmsBody.setValid(response.getValid());
+            sentSmsBody.setRequestId(response.getRequest_id());
+            sentSmsBody.setClientId(rental.getClient().getId());
+            smsService.saveSentSms(sentSmsBody);
         }
     }
 }

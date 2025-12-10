@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import to.co.divinesolutions.tenors.enums.SmsType;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,13 @@ public class SMSCallBackHistory {
     private String message;
 
     private LocalDateTime receivedAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    private SmsType smsType;
+
+    private Long propertyId;
+    private Long rentalId;
+    private Long clientId;
 
     private boolean successful;
     private Long requestId;
