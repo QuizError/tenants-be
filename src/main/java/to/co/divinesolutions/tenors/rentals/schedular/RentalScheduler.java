@@ -51,7 +51,7 @@ public class RentalScheduler {
     }
 
     void sendEndOfContractSMSNotification(Rental rental) throws JsonProcessingException {
-        SMSDto smsDto = new SMSDto();
+            SMSDto smsDto = new SMSDto();
             User user = rental.getClient().getUser();
             String clientName = user.getFirstname()+" "+user.getLastname();
             String clientMobile = user.getMsisdn();
@@ -68,23 +68,37 @@ public class RentalScheduler {
             smsDto.setRecipients(recipients);
             String sentSmsResponse =  smsService.sendSms(smsDto);
 
-        //saving the message sent to Client
-        ObjectMapper mapper = new ObjectMapper();
-        BeemSMSCallback response = mapper.readValue(sentSmsResponse, BeemSMSCallback.class);
+            //search if property has notify me to owners contact person
+            if(property.getNotifyMeEndOfContract()){
+                String messageToOwner = "Ndugu "+clientName+" ametumiwa ujumbe wa kukumbushwa kuwa mkataba wake wa pango kwa "+property.getName()+" kwenye nyumba "+rental.getUnitSection().getName()+" utaisha muda wake "+formattedDate+". na kuhimizwa ku thibitisha kuanza mkataba mwingine na kuulipia ndani ya wiki tatu kuanzia leo au kuachilia nafasi tarehe ya mwisho wa Mkataba";
+                smsDto.setMessage(messageToOwner);
+                smsDto.setSourceAddr(property.getSenderName() != null && !property.getSenderName().isEmpty() ? property.getSenderName() : "HOMES APP");
+                Recipient contactPerson = new Recipient();
+                contactPerson.setRecipient_id(1);
+                contactPerson.setDest_addr(property.getContactPersonMobile());
+                List<Recipient> contactPersons = Collections.singletonList(contactPerson);
+                smsDto.setRecipients(contactPersons);
+                smsService.sendSms(smsDto);
+            }
+            //end of check
 
-        SentSmsBody sentSmsBody = new SentSmsBody();
-        sentSmsBody.setSmsType(SmsType.CONTRACT_END_REMINDER);
-        sentSmsBody.setInvalid(response.getInvalid());
-        sentSmsBody.setDuplicates(response.getDuplicates());
-        sentSmsBody.setSuccessful(response.isSuccessful());
-        sentSmsBody.setValid(response.getValid());
-        sentSmsBody.setRequestId(response.getRequest_id());
-        sentSmsBody.setClientId(rental.getClient().getId());
-        sentSmsBody.setMessage(message);
-        sentSmsBody.setRentalId(rental.getId());
-        sentSmsBody.setPropertyId(property.getId());
-        sentSmsBody.setCode(response.getCode());
-        smsService.saveSentSms(sentSmsBody);
+            //saving the message sent to Client
+            ObjectMapper mapper = new ObjectMapper();
+            BeemSMSCallback response = mapper.readValue(sentSmsResponse, BeemSMSCallback.class);
+
+            SentSmsBody sentSmsBody = new SentSmsBody();
+            sentSmsBody.setSmsType(SmsType.CONTRACT_END_REMINDER);
+            sentSmsBody.setInvalid(response.getInvalid());
+            sentSmsBody.setDuplicates(response.getDuplicates());
+            sentSmsBody.setSuccessful(response.isSuccessful());
+            sentSmsBody.setValid(response.getValid());
+            sentSmsBody.setRequestId(response.getRequest_id());
+            sentSmsBody.setClientId(rental.getClient().getId());
+            sentSmsBody.setMessage(message);
+            sentSmsBody.setRentalId(rental.getId());
+            sentSmsBody.setPropertyId(property.getId());
+            sentSmsBody.setCode(response.getCode());
+            smsService.saveSentSms(sentSmsBody);
     }
 
     @Async
