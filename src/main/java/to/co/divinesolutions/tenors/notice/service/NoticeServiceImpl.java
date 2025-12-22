@@ -213,6 +213,8 @@ public class NoticeServiceImpl implements NoticeService{
             sentSmsBody.setValid(response.getValid());
             sentSmsBody.setRequestId(response.getRequest_id());
             sentSmsBody.setClientId(rental.getClient().getId());
+            sentSmsBody.setSentTo(clientMobile);
+            sentSmsBody.setSentTo(clientMobile);
             smsService.saveSentSms(sentSmsBody);
     }
 

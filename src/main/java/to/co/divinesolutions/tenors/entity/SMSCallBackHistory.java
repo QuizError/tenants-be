@@ -40,4 +40,5 @@ public class SMSCallBackHistory {
     private Integer valid;
     private Integer invalid;
     private Integer duplicates;
+    private String sentTo;
 }

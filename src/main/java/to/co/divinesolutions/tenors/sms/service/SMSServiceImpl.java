@@ -104,6 +104,7 @@ public class SMSServiceImpl implements SMSService{
         sms.setInvalid(body.getInvalid());
         sms.setRequestId(body.getRequestId());
         sms.setReceivedAt(LocalDateTime.now());
+        sms.setSentTo(body.getSentTo());
         beemCallBackRepository.save(sms);
     }
 

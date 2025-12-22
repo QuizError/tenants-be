@@ -175,6 +175,7 @@ public class PaymentServiceImpl implements PaymentService{
             sentSmsBody.setValid(response.getValid());
             sentSmsBody.setRequestId(response.getRequest_id());
             sentSmsBody.setClientId(rental.getClient().getId());
+            sentSmsBody.setSentTo(clientMobile);
             smsService.saveSentSms(sentSmsBody);
         }
     }

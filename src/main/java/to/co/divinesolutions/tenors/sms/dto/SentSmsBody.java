@@ -20,4 +20,5 @@ public class SentSmsBody {
         private Integer valid;
         private Integer invalid;
         private Long requestId;
+        private String sentTo;
 }
