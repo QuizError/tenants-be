@@ -2,7 +2,9 @@ package to.co.divinesolutions.tenors.property.service;
 
 import to.co.divinesolutions.tenors.entity.GroupOwnership;
 import to.co.divinesolutions.tenors.entity.Property;
+import to.co.divinesolutions.tenors.property.dto.BroadcastDto;
 import to.co.divinesolutions.tenors.property.dto.PropertyDto;
+import to.co.divinesolutions.tenors.sms.dto.SMSDto;
 import to.co.divinesolutions.tenors.uaa.dto.UserDto;
 import to.co.divinesolutions.tenors.utils.Response;
 
@@ -24,4 +26,6 @@ public interface PropertyService {
     List<Property> getMyProperties(String userUid);
 
     List<Long> getMyPropertyIds(String userUid);
+
+    Response<SMSDto> sendBroadcastSms(BroadcastDto dto);
 }

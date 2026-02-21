@@ -3,8 +3,10 @@ package to.co.divinesolutions.tenors.property.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import to.co.divinesolutions.tenors.entity.Property;
+import to.co.divinesolutions.tenors.property.dto.BroadcastDto;
 import to.co.divinesolutions.tenors.property.dto.PropertyDto;
 import to.co.divinesolutions.tenors.property.service.PropertyService;
+import to.co.divinesolutions.tenors.sms.dto.SMSDto;
 import to.co.divinesolutions.tenors.utils.Response;
 
 import java.util.List;
@@ -39,5 +41,10 @@ public class PropertyController {
     @GetMapping("/user/{uid}")
     public List<Property> myProperties(@PathVariable String uid){
         return propertyService.getMyProperties(uid);
+    }
+
+    @PostMapping("/broadcast")
+    public Response<SMSDto> save(@RequestBody BroadcastDto dto){
+        return propertyService.sendBroadcastSms(dto);
     }
 }

@@ -10,14 +10,20 @@ import to.co.divinesolutions.tenors.enums.PropertyFunctionStatus;
 import to.co.divinesolutions.tenors.enums.PropertyOwnershipType;
 import to.co.divinesolutions.tenors.ownership.service.GroupOwnershipMemberService;
 import to.co.divinesolutions.tenors.ownership.service.GroupOwnershipService;
+import to.co.divinesolutions.tenors.property.dto.BroadcastDto;
 import to.co.divinesolutions.tenors.property.dto.PropertyDto;
 import to.co.divinesolutions.tenors.property.repository.PropertyRepository;
+import to.co.divinesolutions.tenors.sms.dto.Recipient;
+import to.co.divinesolutions.tenors.sms.dto.SMSDto;
+import to.co.divinesolutions.tenors.sms.service.SMSService;
 import to.co.divinesolutions.tenors.uaa.service.UserService;
+import to.co.divinesolutions.tenors.utils.BaseEntity;
 import to.co.divinesolutions.tenors.utils.Response;
 import to.co.divinesolutions.tenors.utils.ResponseCode;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +35,7 @@ public class PropertyServiceImpl implements PropertyService{
     private final GroupOwnershipMemberService groupOwnershipMemberService;
     private final GroupOwnershipService groupOwnershipService;
     private final PropertyRepository propertyRepository;
+    private final SMSService smsService;
     private final UserService userService;
 
     @Override
@@ -44,11 +51,11 @@ public class PropertyServiceImpl implements PropertyService{
 
             if (dto.getOwnershipType().equals(PropertyOwnershipType.PRIVATE)){
                 Optional<User> optionalUser = userService.getOptionalByUid(dto.getOwnerUid());
-                Long ownerId = optionalUser.isPresent() ? optionalUser.get().getId() : 1L;
+                Long ownerId = optionalUser.map(BaseEntity::getId).orElse(null);
                 property.setOwnerId(ownerId);
             }else {
                 Optional<GroupOwnership> optionalGroupOwnership = groupOwnershipService.getOptionalByUid(dto.getOwnerUid());
-                Long ownerId = optionalGroupOwnership.isPresent() ? optionalGroupOwnership.get().getId() : 1L;
+                Long ownerId = optionalGroupOwnership.map(BaseEntity::getId).orElse(null);
                 property.setOwnerId(ownerId);
             }
             property.setName(dto.getName());
@@ -117,13 +124,11 @@ public class PropertyServiceImpl implements PropertyService{
 
     @Override
     public List<Property> getMyProperties(String userUid){
-        List<GroupOwnership> groupOwnerships = groupOwnershipMemberService.listMyGroups(userUid);
-        List<Property> properties = new ArrayList<>();
-        for (GroupOwnership groupOwnership: groupOwnerships){
-            List<Property> optionalProperties = propertyRepository.findAllByOwnerIdAndOwnershipType(groupOwnership.getId(),groupOwnership.getOwnershipType());
-            properties.addAll(optionalProperties);
+        List<GroupOwnership> myGroups = groupOwnershipMemberService.listMyGroups(userUid);
+        for (GroupOwnership groupOwnership: myGroups){
+            return propertyRepository.findAllByOwnerIdAndOwnershipType(groupOwnership.getId(),groupOwnership.getOwnershipType());
         }
-        return properties;
+        return Collections.emptyList();
     }
 
     @Override
@@ -139,5 +144,36 @@ public class PropertyServiceImpl implements PropertyService{
             propertyIds.add(property.getId());
         }
         return propertyIds;
+    }
+
+    @Override
+    public Response<SMSDto> sendBroadcastSms(BroadcastDto dto){
+        Optional<Property> optionalProperty = getOptionalByUid(dto.getPropertyUid());
+        if (optionalProperty.isPresent()){
+            //Prepare an empty list of Recipients
+            List<Recipient> recipients = new ArrayList<>();
+
+            Property property = optionalProperty.get();
+            String senderName = property.getSenderName() != null && !property.getSenderName().isEmpty() ?  property.getSenderName() : "HOMES APP";
+            List<String> msisdnList = userService.userMsisdnList(property.getId());
+
+            for (int i = 0; i < msisdnList.size(); i++) {
+                Recipient recipient = new Recipient();
+                recipient.setRecipient_id(i + 1);
+                recipient.setDest_addr(msisdnList.get(i));
+                recipients.add(recipient);
+            }
+
+            SMSDto smsDto = new SMSDto();
+            smsDto.setMessage(dto.getMessage());
+            smsDto.setSourceAddr(senderName);
+            smsDto.setRecipients(recipients);
+//            smsService.sendSms(smsDto);
+            log.info("The send list is: {}",  smsDto);
+            return new Response<>(true, ResponseCode.SUCCESS,"SMS request sent successfully", smsDto);
+        }
+        else {
+            return new Response<>(false, ResponseCode.NO_DATA_FOUND,Collections.emptyList(),"Property could not be found or may have been deleted from the system");
+        }
     }
 }

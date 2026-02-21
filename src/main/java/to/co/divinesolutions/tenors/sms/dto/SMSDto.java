@@ -13,4 +13,13 @@ public class SMSDto {
     private String sourceAddr;
     private String message;
     private List<Recipient> recipients;
+
+    @Override
+    public String toString() {
+        return "SMSDto{" +
+                "sourceAddr='" + sourceAddr + '\'' +
+                ", message='" + message + '\'' +
+                ", recipients=" + recipients +
+                '}';
+    }
 }

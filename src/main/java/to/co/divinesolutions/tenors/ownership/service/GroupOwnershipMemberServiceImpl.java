@@ -113,17 +113,23 @@ public class GroupOwnershipMemberServiceImpl implements GroupOwnershipMemberServ
 
     @Override
     public List<GroupOwnership> listMyGroups(String userUid){
-        Optional<User> optionalGroup = userService.getOptionalByUid(userUid);
-        if (optionalGroup.isPresent()){
-            User user = optionalGroup.get();
-            List<GroupOwnership> myGroups = new ArrayList<>();
-            List<GroupOwnershipMember> myGroupMemberships = groupOwnershipMemberRepository.findAllByUser(user);
-            for (GroupOwnershipMember membership : myGroupMemberships){
-                myGroups.add(membership.getGroup());
+        try {
+            Optional<User> optionalUser = userService.getOptionalByUid(userUid);
+            if (optionalUser.isPresent()){
+                User user = optionalUser.get();
+                List<GroupOwnership> myGroups = new ArrayList<>();
+                List<GroupOwnershipMember> myGroupMemberships = groupOwnershipMemberRepository.findAllByUser(user);
+                for (GroupOwnershipMember membership : myGroupMemberships){
+                    myGroups.add(membership.getGroup());
+                }
+                return myGroups;
             }
-            return myGroups;
+            else {
+                return Collections.emptyList();
+            }
         }
-        else {
+        catch (Exception e){
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }

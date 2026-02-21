@@ -27,4 +27,6 @@ public interface UserService {
     Page<User> usersPageable(Pageable pageable);
 
     Response<UserData> userLogin(LoginDto dto);
+
+    List<String> userMsisdnList(Long propertyId);
 }
