@@ -168,7 +168,7 @@ public class PropertyServiceImpl implements PropertyService{
             smsDto.setMessage(dto.getMessage());
             smsDto.setSourceAddr(senderName);
             smsDto.setRecipients(recipients);
-//            smsService.sendSms(smsDto);
+            smsService.sendSms(smsDto);
             log.info("The send list is: {}",  smsDto);
             return new Response<>(true, ResponseCode.SUCCESS,"SMS request sent successfully", smsDto);
         }
