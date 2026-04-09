@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface ClientRepository extends JpaRepository<Client,Long> {
     Optional<Client> findFirstByUid(String uid);
     @Query(value = """
-            SELECT * FROM clients WHERE created_by IN (SELECT user_id FROM group_ownership_members WHERE user_id=:userId)
+            SELECT * FROM clients WHERE active= true AND created_by IN (SELECT user_id FROM group_ownership_members WHERE user_id=:userId)
             """,
             nativeQuery = true)
     List<Client> getMyClients(Long userId);

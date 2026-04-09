@@ -116,10 +116,9 @@ public class ClientServiceImpl implements ClientService{
             for (Rental rental: clientRentals){
                 Optional<Bill> optionalBill = billRepository.findFirstByBillableIdAndBillType(rental.getId(), BillType.RENTALS);
                 if (optionalBill.isPresent()){
-                    Bill bill = optionalBill.orElse(null);
-                    paymentRepository.deleteAllByBill(bill);
-                    billRepository.delete(bill);
-                    rentalRepository.deleteAllByClient(client);
+                    Bill bill =  optionalBill.get();
+                    setPaymentsNotActive(paymentRepository.findAllByBill(bill));
+                    setBillNotActive(bill);
                 }
             }
             clientRepository.delete(client);
@@ -147,4 +146,22 @@ public class ClientServiceImpl implements ClientService{
         User user = optionalUser.get();
         return clientRepository.getMyClients(user.getId());
     }
+
+    void setPaymentsNotActive(List<Payment>  payments){
+        for (Payment payment: payments){
+            payment.setActive(false);
+            paymentRepository.save(payment);
+        }
+    }
+
+    void setBillNotActive(Bill bill){
+        bill.setActive(false);
+        billRepository.save(bill);
+    }
+
+
+//    Bill bill = optionalBill.orElse(null);
+//    paymentRepository.deleteAllByBill(bill);
+//    billRepository.delete(bill);
+//    rentalRepository.deleteAllByClient(client);
 }

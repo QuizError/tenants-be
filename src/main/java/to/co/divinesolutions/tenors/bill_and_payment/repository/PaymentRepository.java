@@ -15,4 +15,5 @@ public interface PaymentRepository extends JpaRepository<Payment,Long> {
     Optional<Payment> findFirstByUid(String uid);
     void deleteAllByBill(Bill bill);
     Page<Payment> findAllByBillIn(List<Bill> bills, Pageable pageable);
+    List<Payment>  findAllByBill(Bill bill);
 }
